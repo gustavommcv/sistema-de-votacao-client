@@ -22,16 +22,28 @@
     <div class="poll-options">
       <h2>Opções de resposta:</h2>
 
+      <div *ngIf="hasVoted" class="voted-message">
+        <i class="fas fa-check-circle"></i> Você já votou nesta enquete:
+        <strong>{{ getSelectedOptionText() }}</strong>
+        (Opção ID: {{ poll.user_vote }})
+      </div>
+
       <div *ngFor="let option of poll.options" class="option">
-        <label>
+        <label [class.selected]="hasVoted && option.id === poll.user_vote">
           <input
             type="radio"
             name="pollOption"
             [value]="option.id"
             [(ngModel)]="selectedOption"
-            [disabled]="!isPollActive || !authService.isLoggedIn()"
+            [disabled]="!isPollActive || !authService.isLoggedIn() || hasVoted"
           />
           {{ option.text }}
+          <span
+            *ngIf="hasVoted && option.id === poll.user_vote"
+            class="your-vote"
+          >
+            <i class="fas fa-check"></i> Seu voto
+          </span>
         </label>
         <span class="votes-count">{{ option.votes_count }} votos</span>
       </div>
@@ -41,9 +53,9 @@
       <ng-container *ngIf="authService.isLoggedIn(); else notLoggedIn">
         <app-button
           (click)="submitVote()"
-          [disabled]="!selectedOption || !isPollActive"
+          [disabled]="!selectedOption || !isPollActive || hasVoted"
         >
-          Votar
+          {{ hasVoted ? "Voto Registrado" : "Votar" }}
         </app-button>
       </ng-container>
 

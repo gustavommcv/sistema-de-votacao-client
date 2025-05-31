@@ -23,6 +23,7 @@ export interface PollWithOptions extends Poll {
     text: string;
     votes_count: number;
   }[];
+  user_vote: number | null;
 }
 
 @Injectable({
@@ -31,14 +32,16 @@ export interface PollWithOptions extends Poll {
 export class PollService {
   private apiUrl = `${environment.apiUrl}/polls`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAllPolls(): Observable<{ data: Poll[] }> {
     return this.http.get<{ data: Poll[] }>(this.apiUrl);
   }
 
   getPollById(id: number): Observable<{ data: PollWithOptions }> {
-    return this.http.get<{ data: PollWithOptions }>(`${this.apiUrl}/${id}`);
+    return this.http.get<{ data: PollWithOptions }>(`${this.apiUrl}/${id}`, {
+      withCredentials: true,
+    });
   }
 
   vote(pollId: number, optionId: number): Observable<any> {

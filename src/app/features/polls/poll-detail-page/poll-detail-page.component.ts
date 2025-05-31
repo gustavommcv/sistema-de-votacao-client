@@ -20,13 +20,14 @@ export class PollDetailPageComponent implements OnInit {
   selectedOption: number | null = null;
   isPollActive = false;
   isDeleting = false;
+  hasVoted = false;
 
   constructor(
     private route: ActivatedRoute,
     public router: Router,
     private pollService: PollService,
     public authService: AuthService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const pollId = this.route.snapshot.paramMap.get('id');
@@ -38,8 +39,26 @@ export class PollDetailPageComponent implements OnInit {
   loadPollDetails(pollId: number): void {
     this.pollService.getPollById(pollId).subscribe({
       next: (response) => {
+        console.log(response.data)
         this.poll = response.data;
         this.checkPollStatus();
+
+        this.hasVoted =
+          this.poll.user_vote !== null && this.poll.user_vote !== undefined;
+
+        if (this.hasVoted) {
+          this.selectedOption = this.poll.user_vote;
+        } else {
+          this.selectedOption = null;
+        }
+
+        console.log('Dados da enquete:', {
+          poll: this.poll,
+          hasVoted: this.hasVoted,
+          user_vote: this.poll.user_vote,
+          selectedOption: this.selectedOption,
+        });
+
         this.loading = false;
       },
       error: (err) => {
@@ -57,8 +76,16 @@ export class PollDetailPageComponent implements OnInit {
     this.isPollActive = now >= startDate && now <= endDate;
   }
 
+  getSelectedOptionText(): string {
+    if (!this.selectedOption) return '';
+    const option = this.poll.options.find(
+      (opt) => opt.id === this.selectedOption,
+    );
+    return option ? option.text : '';
+  }
+
   submitVote(): void {
-    if (!this.selectedOption || !this.isPollActive) return;
+    if (!this.selectedOption || !this.isPollActive || this.hasVoted) return;
 
     if (!this.authService.isLoggedIn()) {
       this.error = 'Você precisa estar logado para votar';
@@ -68,6 +95,7 @@ export class PollDetailPageComponent implements OnInit {
 
     this.pollService.vote(this.poll.id, this.selectedOption).subscribe({
       next: () => {
+        this.hasVoted = true;
         this.loadPollDetails(this.poll.id);
       },
       error: (err) => {
