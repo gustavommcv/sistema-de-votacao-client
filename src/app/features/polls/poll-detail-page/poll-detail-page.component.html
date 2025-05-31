@@ -1,0 +1,49 @@
+<div class="poll-detail-container">
+  <div *ngIf="loading" class="loading">Carregando enquete...</div>
+
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <div *ngIf="poll" class="poll-detail">
+    <h1>{{ poll.title }}</h1>
+
+    <div class="poll-meta">
+      <span
+        class="status-badge"
+        [class.active]="isPollActive"
+        [class.inactive]="!isPollActive"
+      >
+        {{ isPollActive ? "Em andamento" : "Encerrada" }}
+      </span>
+      <span>Início: {{ poll.start_date | date: "dd/MM/yyyy HH:mm" }}</span>
+      <span>Término: {{ poll.end_date | date: "dd/MM/yyyy HH:mm" }}</span>
+      <span>Criada por: {{ poll.user_email }}</span>
+    </div>
+
+    <div class="poll-options">
+      <h2>Opções de resposta:</h2>
+
+      <div *ngFor="let option of poll.options" class="option">
+        <label>
+          <input
+            type="radio"
+            name="pollOption"
+            [value]="option.id"
+            [(ngModel)]="selectedOption"
+            [disabled]="!isPollActive"
+          />
+          {{ option.text }}
+        </label>
+        <span class="votes-count">{{ option.votes_count }} votos</span>
+      </div>
+    </div>
+
+    <div class="poll-actions">
+      <app-button
+        (click)="submitVote()"
+        [disabled]="!selectedOption || !isPollActive"
+      >
+        Votar
+      </app-button>
+    </div>
+  </div>
+</div>

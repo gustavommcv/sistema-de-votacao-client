@@ -1,3 +1,17 @@
-<a class="app-button" [routerLink]="routerLink()">
-  <ng-content />
-</a>
+@if (isLink()) {
+  <a
+    class="app-button app-button__link"
+    [routerLink]="route()"
+    [class.disabled]="disabled()"
+  >
+    <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+  </a>
+} @else {
+  <button class="app-button" [disabled]="disabled()">
+    <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+  </button>
+}
+
+<ng-template #contentTemplate>
+  <ng-content></ng-content>
+</ng-template>

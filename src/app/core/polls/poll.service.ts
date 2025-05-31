@@ -17,15 +17,33 @@ export interface Poll {
   };
 }
 
+export interface PollWithOptions extends Poll {
+  options: {
+    id: number;
+    text: string;
+    votes_count: number;
+  }[];
+}
+
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PollService {
   private apiUrl = `${environment.apiUrl}/polls`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  getAllPolls(): Observable<{data: Poll[]}> {
-    return this.http.get<{data: Poll[]}>(this.apiUrl);
+  getAllPolls(): Observable<{ data: Poll[] }> {
+    return this.http.get<{ data: Poll[] }>(this.apiUrl);
+  }
+
+  getPollById(id: number): Observable<{ data: PollWithOptions }> {
+    return this.http.get<{ data: PollWithOptions }>(`${this.apiUrl}/${id}`);
+  }
+
+  vote(pollId: number, optionId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${pollId}/vote`, {
+      option_id: optionId,
+    });
   }
 }
