@@ -31,7 +31,7 @@ export interface PollWithOptions extends Poll {
 export class PollService {
   private apiUrl = `${environment.apiUrl}/polls`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getAllPolls(): Observable<{ data: Poll[] }> {
     return this.http.get<{ data: Poll[] }>(this.apiUrl);
@@ -42,9 +42,11 @@ export class PollService {
   }
 
   vote(pollId: number, optionId: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/${pollId}/vote`, {
-      option_id: optionId,
-    });
+    return this.http.post(
+      `${this.apiUrl}/${pollId}/vote`,
+      { option_id: optionId },
+      { withCredentials: true },
+    );
   }
 
   createPoll(pollData: {

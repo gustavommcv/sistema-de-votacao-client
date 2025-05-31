@@ -1,7 +1,7 @@
 <div class="poll-detail-container">
   <div *ngIf="loading" class="loading">Carregando enquete...</div>
 
-  <div *If="error" class="error">{{ error }}</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
 
   <div *ngIf="poll" class="poll-detail">
     <h1>{{ poll.title }}</h1>
@@ -38,20 +38,22 @@
     </div>
 
     <div class="poll-actions">
-      @if (authService.isLoggedIn()) {
+      <ng-container *ngIf="authService.isLoggedIn(); else notLoggedIn">
         <app-button
           (click)="submitVote()"
           [disabled]="!selectedOption || !isPollActive"
         >
           Votar
         </app-button>
-      } @else {
+      </ng-container>
+
+      <ng-template #notLoggedIn>
         <app-button (click)="router.navigate(['/login'])" class="login-to-vote">
           Faça login para votar
         </app-button>
-      }
+      </ng-template>
 
-      @if (authService.getCurrentUser()?.id === poll.user_id) {
+      <ng-container *ngIf="authService.getCurrentUser()?.id === poll.user_id">
         <app-button
           (click)="deletePoll()"
           [disabled]="isDeleting"
@@ -59,7 +61,7 @@
         >
           {{ isDeleting ? "Deletando..." : "Deletar Enquete" }}
         </app-button>
-      }
+      </ng-container>
     </div>
   </div>
 </div>

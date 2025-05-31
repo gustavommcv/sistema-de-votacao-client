@@ -26,7 +26,7 @@ export class PollDetailPageComponent implements OnInit {
     public router: Router,
     private pollService: PollService,
     public authService: AuthService,
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     const pollId = this.route.snapshot.paramMap.get('id');
