@@ -36,6 +36,17 @@
       </div>
     </div>
 
+    <div
+      *ngIf="
+        (dateError || pollForm.hasError('invalidDates')) &&
+        pollForm.get('start_date')?.touched &&
+        pollForm.get('end_date')?.touched
+      "
+      class="error-message"
+    >
+      {{ dateError || "A data de término deve ser posterior à data de início" }}
+    </div>
+
     <div class="form-group">
       <label>Opções de Resposta</label>
       <div formArrayName="options" class="options-list">

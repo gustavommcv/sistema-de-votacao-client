@@ -18,6 +18,7 @@ export class PollCreatePageComponent {
   pollForm: FormGroup;
   loading = false;
   error: string | null = null;
+  dateError: string | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -25,19 +26,36 @@ export class PollCreatePageComponent {
     private router: Router,
     private authService: AuthService,
   ) {
-    this.pollForm = this.fb.group({
-      title: ['', [Validators.required, Validators.minLength(5)]],
-      start_date: ['', Validators.required],
-      end_date: ['', Validators.required],
-      options: this.fb.array(
-        [this.createOption(), this.createOption(), this.createOption()],
-        { validators: Validators.minLength(3) },
-      ),
-    });
+    this.pollForm = this.fb.group(
+      {
+        title: ['', [Validators.required, Validators.minLength(5)]],
+        start_date: ['', Validators.required],
+        end_date: ['', Validators.required],
+        options: this.fb.array(
+          [this.createOption(), this.createOption(), this.createOption()],
+          { validators: Validators.minLength(3) },
+        ),
+      },
+      { validator: this.dateValidator },
+    );
 
     if (!this.authService.isLoggedIn()) {
       this.router.navigate(['/login']);
     }
+  }
+
+  private dateValidator(group: FormGroup): { [key: string]: any } | null {
+    const startDate = group.get('start_date')?.value;
+    const endDate = group.get('end_date')?.value;
+
+    if (!startDate || !endDate) {
+      return null;
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    return start >= end ? { invalidDates: true } : null;
   }
 
   createOption(): FormGroup {
@@ -61,29 +79,42 @@ export class PollCreatePageComponent {
   }
 
   onSubmit(): void {
-    if (this.pollForm.invalid || !this.authService.isLoggedIn()) return;
+    this.error = null;
+    this.dateError = null;
+
+    if (this.pollForm.invalid || !this.authService.isLoggedIn()) {
+      if (this.pollForm.hasError('invalidDates')) {
+        this.dateError =
+          'A data de término deve ser posterior à data de início';
+      }
+      return;
+    }
+
+    const startDate = new Date(this.pollForm.value.start_date);
+    const endDate = new Date(this.pollForm.value.end_date);
+
+    if (startDate >= endDate) {
+      this.dateError = 'A data de término deve ser posterior à data de início';
+      return;
+    }
 
     this.loading = true;
-    this.error = null;
 
-    const formValue = this.pollForm.value;
-
-    const startDate = new Date(formValue.start_date);
     startDate.setHours(0, 0, 0, 0);
-
-    const endDate = new Date(formValue.end_date);
-    endDate.setHours(0, 0, 0, 0);
+    endDate.setHours(23, 59, 59, 999);
 
     const pollData = {
-      title: formValue.title,
+      title: this.pollForm.value.title,
       start_date: startDate.toISOString(),
       end_date: endDate.toISOString(),
-      options: formValue.options.map((opt: { text: string }) => opt.text),
+      options: this.pollForm.value.options.map(
+        (opt: { text: string }) => opt.text,
+      ),
     };
 
     this.pollService.createPoll(pollData).subscribe({
       next: (response) => {
-        if (response && response.data && response.data.id) {
+        if (response?.data?.id) {
           this.router.navigate(['/polls', response.data.id]);
         } else {
           this.error = 'Resposta inválida do servidor';
