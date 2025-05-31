@@ -1,0 +1,16 @@
+<div class="poll-card">
+  <div class="poll-card__header">
+    <h3 class="poll-card__title">{{ poll.title }}</h3>
+    <span class="poll-status" [class]="'status-' + statusClass">{{
+      status
+    }}</span>
+  </div>
+  <div class="poll-meta">
+    <span>Criado por: {{ poll.user_email }}</span>
+    <span>Início: {{ poll.start_date | date: "dd/MM/yyyy" }}</span>
+    <span>Término: {{ poll.end_date | date: "dd/MM/yyyy" }}</span>
+  </div>
+  <div class="poll-actions">
+    <app-button [routerLink]="['/polls', poll.id]">Ver detalhes</app-button>
+  </div>
+</div>

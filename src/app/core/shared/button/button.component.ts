@@ -8,5 +8,5 @@ import { RouterLink } from '@angular/router';
   styleUrl: './button.component.scss',
 })
 export class ButtonComponent {
-  routerLink = input<string>('');
+  routerLink = input<string | any[]>('');
 }

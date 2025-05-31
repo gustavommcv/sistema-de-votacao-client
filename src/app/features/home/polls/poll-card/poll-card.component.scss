@@ -1,0 +1,57 @@
+.poll-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 2rem 4rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__title {
+    margin-top: 0;
+    color: #333;
+    font-size: 2rem;
+  }
+
+  .poll-meta {
+    display: flex;
+    gap: 1rem;
+    margin: 0.5rem 0;
+    font-size: 1.5rem;
+    color: #666;
+  }
+
+  .poll-actions {
+    margin-top: 1rem;
+  }
+
+  .poll-status {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 1.4rem;
+    font-weight: bold;
+  }
+
+  .status-not-started {
+    background-color: #ffc107;
+    color: #333;
+  }
+
+  .status-in-progress {
+    background-color: #28a745;
+    color: white;
+  }
+
+  .status-finished {
+    background-color: #dc3545;
+    color: white;
+  }
+}

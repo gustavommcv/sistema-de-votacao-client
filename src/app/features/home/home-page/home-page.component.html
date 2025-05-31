@@ -1,1 +1,15 @@
-<p>home-page works!</p>
+<section class="home-page">
+  <h1 class="home-page__title">Enquetes Disponíveis</h1>
+
+  <div *ngIf="loading" class="loading">Carregando enquetes...</div>
+
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <div class="poll-list">
+    <app-poll-card *ngFor="let poll of polls" [poll]="poll"></app-poll-card>
+  </div>
+
+  <div *ngIf="!loading && polls.length === 0" class="no-polls">
+    Nenhuma enquete disponível no momento.
+  </div>
+</section>

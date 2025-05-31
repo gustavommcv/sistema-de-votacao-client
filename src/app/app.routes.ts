@@ -3,7 +3,11 @@ import { HomePageComponent } from './features/home/home-page/home-page.component
 import { LoginPageComponent } from './features/auth/login-page/login-page.component';
 
 export const routes: Routes = [
-  { path: '', component: HomePageComponent },
+  {
+    path: '',
+    component: HomePageComponent,
+    title: 'Sistema de Votação',
+  },
   {
     path: 'login',
     component: LoginPageComponent,
