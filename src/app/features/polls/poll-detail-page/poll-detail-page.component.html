@@ -44,6 +44,16 @@
       >
         Votar
       </app-button>
+
+      @if (authService.getCurrentUser()?.id === poll.user_id) {
+        <app-button
+          (click)="deletePoll()"
+          [disabled]="isDeleting"
+          class="delete-btn"
+        >
+          {{ isDeleting ? 'Deletando...' : 'Deletar Enquete' }}
+        </app-button>
+      }
     </div>
   </div>
 </div>

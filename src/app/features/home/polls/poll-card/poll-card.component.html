@@ -12,5 +12,14 @@
   </div>
   <div class="poll-actions">
     <app-button [routerLink]="['/polls', poll.id]">Ver detalhes</app-button>
+    @if (authService.getCurrentUser()?.id === poll.user_id) {
+      <app-button
+        (click)="deletePoll(poll.id, $event)"
+        [disabled]="isDeleting"
+        class="delete-btn"
+      >
+        {{ isDeleting ? "Deletando..." : "Deletar" }}
+      </app-button>
+    }
   </div>
 </div>

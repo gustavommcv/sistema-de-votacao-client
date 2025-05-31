@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '../../../core/shared/button/button.component';
 import { PollService, PollWithOptions } from '../../../core/polls/poll.service';
+import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-poll-detail-page',
@@ -18,10 +19,13 @@ export class PollDetailPageComponent implements OnInit {
   error: string | null = null;
   selectedOption: number | null = null;
   isPollActive = false;
+  isDeleting = false;
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private pollService: PollService,
+    public authService: AuthService,
   ) { }
 
   ngOnInit(): void {
@@ -62,6 +66,28 @@ export class PollDetailPageComponent implements OnInit {
       },
       error: (err) => {
         console.error('Erro ao votar:', err);
+      },
+    });
+  }
+
+  deletePoll(): void {
+    if (
+      !confirm(
+        'Tem certeza que deseja deletar esta enquete? Esta ação não pode ser desfeita.',
+      )
+    ) {
+      return;
+    }
+
+    this.isDeleting = true;
+    this.pollService.deletePoll(this.poll.id).subscribe({
+      next: () => {
+        this.router.navigate(['/']);
+      },
+      error: (err) => {
+        console.error('Erro ao deletar enquete:', err);
+        this.isDeleting = false;
+        this.error = 'Erro ao deletar enquete';
       },
     });
   }

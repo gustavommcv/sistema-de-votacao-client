@@ -57,4 +57,10 @@ export class PollService {
       withCredentials: true,
     });
   }
+
+  deletePoll(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`, {
+      withCredentials: true,
+    });
+  }
 }

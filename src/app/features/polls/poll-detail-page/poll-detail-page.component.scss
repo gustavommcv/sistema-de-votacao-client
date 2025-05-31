@@ -82,6 +82,8 @@
 .poll-actions {
   margin-top: 2rem;
   text-align: center;
+  display: flex;
+  gap: 1rem;
 }
 
 .loading, .error {
