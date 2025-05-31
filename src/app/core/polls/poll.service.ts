@@ -46,4 +46,15 @@ export class PollService {
       option_id: optionId,
     });
   }
+
+  createPoll(pollData: {
+    title: string;
+    start_date: string;
+    end_date: string;
+    options: string[];
+  }): Observable<any> {
+    return this.http.post(`${this.apiUrl}`, pollData, {
+      withCredentials: true,
+    });
+  }
 }

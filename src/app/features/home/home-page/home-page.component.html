@@ -1,4 +1,8 @@
 <section class="home-page">
+  @if (authService.isAuthenticated$ | async) {
+    <app-button routerLink="/polls/create">Criar Enquete</app-button>
+  }
+
   <h1 class="home-page__title">Enquetes Disponíveis</h1>
 
   <div *ngIf="loading" class="loading">Carregando enquetes...</div>
