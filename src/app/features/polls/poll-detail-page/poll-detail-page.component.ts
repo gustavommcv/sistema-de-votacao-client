@@ -23,7 +23,7 @@ export class PollDetailPageComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router,
+    public router: Router,
     private pollService: PollService,
     public authService: AuthService,
   ) { }
@@ -60,12 +60,26 @@ export class PollDetailPageComponent implements OnInit {
   submitVote(): void {
     if (!this.selectedOption || !this.isPollActive) return;
 
+    if (!this.authService.isLoggedIn()) {
+      this.error = 'Você precisa estar logado para votar';
+      this.router.navigate(['/login']);
+      return;
+    }
+
     this.pollService.vote(this.poll.id, this.selectedOption).subscribe({
       next: () => {
         this.loadPollDetails(this.poll.id);
       },
       error: (err) => {
         console.error('Erro ao votar:', err);
+        if (err.status === 401) {
+          this.error = 'Sua sessão expirou. Faça login novamente.';
+          this.authService.logout().subscribe(() => {
+            this.router.navigate(['/login']);
+          });
+        } else {
+          this.error = 'Erro ao votar. Tente novamente.';
+        }
       },
     });
   }
