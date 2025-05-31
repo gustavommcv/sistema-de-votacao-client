@@ -28,6 +28,10 @@
 
   &__title {
     font-size: 3rem;
+
+    & a {
+      color: black;
+    }
   }
 
   &__route {

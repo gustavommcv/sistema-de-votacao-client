@@ -1,0 +1,76 @@
+<div class="login-container">
+  <div class="login-card">
+    <img src="/icon.png" alt="Logo" class="logo" />
+    <h2>Login</h2>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          placeholder="seu@email.com"
+          [class.invalid]="email?.invalid && (email?.dirty || email?.touched)"
+        />
+
+        @if (email?.invalid && (email?.dirty || email?.touched)) {
+          <div class="error-message">
+            @if (email?.errors?.["required"]) {
+              Email é obrigatório
+            }
+            @if (email?.errors?.["email"]) {
+              Por favor, insira um email válido
+            }
+          </div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="password">Senha</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          placeholder="••••••"
+          [class.invalid]="
+            password?.invalid && (password?.dirty || password?.touched)
+          "
+        />
+
+        @if (password?.invalid && (password?.dirty || password?.touched)) {
+          <div class="error-message">
+            @if (password?.errors?.["required"]) {
+              Senha é obrigatória
+            }
+            @if (password?.errors?.["minlength"]) {
+              A senha deve ter pelo menos 6 caracteres
+            }
+          </div>
+        }
+      </div>
+
+      @if (errorMessage) {
+        <div class="error-message server-error">
+          {{ errorMessage }}
+        </div>
+      }
+
+      <button
+        type="submit"
+        class="login-button"
+        [disabled]="loginForm.invalid || isLoading"
+      >
+        @if (isLoading) {
+          <span>Entrando...</span>
+        } @else {
+          <span>Entrar</span>
+        }
+      </button>
+    </form>
+
+    <div class="footer-links">
+      <a routerLink="/signup">Criar nova conta</a>
+    </div>
+  </div>
+</div>

@@ -4,9 +4,16 @@
       <img src="/icon.png" alt="Logo" class="header__logo" />
     </div>
     <div class="header__info-container">
-      <h1 class="header__title">{{ title() }}</h1>
+      <h1 class="header__title">
+        <a routerLink="/">{{ title() }}</a>
+      </h1>
       <p class="header__route">/ Sistema de Votação</p>
     </div>
   </div>
-  <app-button>Entrar</app-button>
+
+  @if (authService.isAuthenticated$ | async) {
+    <app-button (click)="logout()">Sair</app-button>
+  } @else {
+    <app-button routerLink="/login">Entrar</app-button>
+  }
 </header>
