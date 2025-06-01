@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '../../../core/shared/button/button.component';
@@ -9,7 +9,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 @Component({
   selector: 'app-poll-detail-page',
   standalone: true,
-  imports: [CommonModule, DatePipe, ButtonComponent, FormsModule],
+  imports: [CommonModule, DatePipe, ButtonComponent, FormsModule, RouterLink],
   templateUrl: './poll-detail-page.component.html',
   styleUrls: ['./poll-detail-page.component.scss'],
 })
@@ -27,7 +27,7 @@ export class PollDetailPageComponent implements OnInit {
     public router: Router,
     private pollService: PollService,
     public authService: AuthService,
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     const pollId = this.route.snapshot.paramMap.get('id');
@@ -39,7 +39,7 @@ export class PollDetailPageComponent implements OnInit {
   loadPollDetails(pollId: number): void {
     this.pollService.getPollById(pollId).subscribe({
       next: (response) => {
-        console.log(response.data)
+        console.log(response.data);
         this.poll = response.data;
         this.checkPollStatus();
 

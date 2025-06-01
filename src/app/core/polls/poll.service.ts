@@ -68,4 +68,12 @@ export class PollService {
       withCredentials: true,
     });
   }
+
+  updatePollTitle(pollId: number, title: string): Observable<any> {
+    return this.http.patch(
+      `${this.apiUrl}/${pollId}/title`,
+      { title },
+      { withCredentials: true },
+    );
+  }
 }

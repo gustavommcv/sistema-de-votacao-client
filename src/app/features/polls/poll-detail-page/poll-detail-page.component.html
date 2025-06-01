@@ -66,6 +66,9 @@
       </ng-template>
 
       <ng-container *ngIf="authService.getCurrentUser()?.id === poll.user_id">
+        <app-button routerLink="/polls/{{ poll.id }}/edit" class="edit-button">
+          Editar Título
+        </app-button>
         <app-button
           (click)="deletePoll()"
           [disabled]="isDeleting"
