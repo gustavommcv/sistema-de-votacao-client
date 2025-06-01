@@ -37,7 +37,7 @@ Frontend do sistema de votação desenvolvido em Angular com integração em tem
 - Exibe enquetes em três categorias: Não Iniciadas, Em Andamento e Finalizadas
 - Cada enquete é apresentada em um `PollCardComponent` com:
   - Título da enquete
-  - Período de votação (data/hora início e término)
+  - Período de votação (data início e término)
   - Status visual (baseado na data atual)
   - O email de quem criou a enquete
 ![image](https://github.com/user-attachments/assets/55e33cb7-c7ad-4b30-b2c2-c6e6a2302270)
@@ -47,7 +47,7 @@ Frontend do sistema de votação desenvolvido em Angular com integração em tem
 - Para cada opção:
   - Mostra texto da opção
   - Contador absoluto de votos
-- Bloqueia interação se enquete não estiver ativa, ou se nao autenticado:
+- Bloqueia interação se enquete não estiver ativa, ou se usuário não autenticado:
   - Botão de votar desabilitado
   - Opções inativas
 - Atualização em tempo real via WebSocket:
@@ -68,8 +68,6 @@ Frontend do sistema de votação desenvolvido em Angular com integração em tem
 
 ### 4. Sistema de Autenticação
 - Fluxo completo de login e logout
-- Armazenamento seguro de token JWT
-- Proteção de rotas autenticadas
 - Validação em tempo real de formulários
 ![image](https://github.com/user-attachments/assets/16726b2c-16c4-4673-9077-29a130c3042d)
 ![image](https://github.com/user-attachments/assets/3d2cd2ab-613a-410c-9e52-e9169bdbac61)
