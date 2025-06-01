@@ -21,13 +21,14 @@ export class PollDetailPageComponent implements OnInit {
   isPollActive = false;
   isDeleting = false;
   hasVoted = false;
+  pollStatus: 'not-started' | 'in-progress' | 'finished' = 'not-started';
 
   constructor(
     private route: ActivatedRoute,
     public router: Router,
     private pollService: PollService,
     public authService: AuthService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const pollId = this.route.snapshot.paramMap.get('id');
@@ -73,7 +74,30 @@ export class PollDetailPageComponent implements OnInit {
     const now = new Date();
     const startDate = new Date(this.poll.start_date);
     const endDate = new Date(this.poll.end_date);
-    this.isPollActive = now >= startDate && now <= endDate;
+
+    if (now < startDate) {
+      this.pollStatus = 'not-started';
+      this.isPollActive = false;
+    } else if (now >= startDate && now <= endDate) {
+      this.pollStatus = 'in-progress';
+      this.isPollActive = true;
+    } else {
+      this.pollStatus = 'finished';
+      this.isPollActive = false;
+    }
+  }
+
+  getStatusText(): string {
+    switch (this.pollStatus) {
+      case 'not-started':
+        return 'Não iniciada';
+      case 'in-progress':
+        return 'Em andamento';
+      case 'finished':
+        return 'Encerrada';
+      default:
+        return '';
+    }
   }
 
   getSelectedOptionText(): string {

@@ -39,17 +39,22 @@
   &__meta-item {}
 
   &__status {
-    padding: 0.25rem 0.75rem;
+    padding: 0.5rem 1rem;
     border-radius: 20px;
+    font-size: 1.4rem;
     font-weight: bold;
-    font-size: 2rem;
 
-    &--active {
+    &--not-started {
+      background-color: #ffc107;
+      color: #333;
+    }
+
+    &--in-progress {
       background-color: #28a745;
       color: white;
     }
 
-    &--inactive {
+    &--finished {
       background-color: #dc3545;
       color: white;
     }
@@ -133,7 +138,7 @@
     border-radius: 8px;
 
     &:hover {
-      background-color: darken(#dc3545, 10%);
+      background-color: #151314;
     }
   }
 }

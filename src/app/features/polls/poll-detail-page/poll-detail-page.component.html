@@ -9,11 +9,13 @@
     <div class="poll-detail__meta">
       <span
         class="poll-detail__status"
-        [class.poll-detail__status--active]="isPollActive"
-        [class.poll-detail__status--inactive]="!isPollActive"
+        [class.poll-detail__status--not-started]="pollStatus === 'not-started'"
+        [class.poll-detail__status--in-progress]="pollStatus === 'in-progress'"
+        [class.poll-detail__status--finished]="pollStatus === 'finished'"
       >
-        {{ isPollActive ? "Em andamento" : "Encerrada" }}
+        {{ getStatusText() }}
       </span>
+
       <span class="poll-detail__meta-item"
         >Início: {{ poll.start_date | date: "dd/MM/yyyy HH:mm" }}</span
       >
