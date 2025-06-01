@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -13,7 +13,7 @@ import { AuthService } from '../../../core/auth/auth.service';
   templateUrl: './poll-detail-page.component.html',
   styleUrls: ['./poll-detail-page.component.scss'],
 })
-export class PollDetailPageComponent implements OnInit {
+export class PollDetailPageComponent implements OnInit, OnDestroy {
   poll!: PollWithOptions;
   loading = true;
   error: string | null = null;
@@ -23,18 +23,50 @@ export class PollDetailPageComponent implements OnInit {
   hasVoted = false;
   pollStatus: 'not-started' | 'in-progress' | 'finished' = 'not-started';
 
+  private pollId!: number;
+  private voteUpdateCallback = (data: any) => {
+    if (data.pollId === this.pollId && this.poll) {
+      this.poll.options = data.options;
+
+      if (this.poll.user_vote !== null) {
+        const votedOption = this.poll.options.find(
+          (opt) => opt.id === this.poll.user_vote,
+        );
+        if (votedOption) {
+          this.hasVoted = true;
+          this.selectedOption = this.poll.user_vote;
+        }
+      }
+    }
+  };
+
   constructor(
     private route: ActivatedRoute,
     public router: Router,
     private pollService: PollService,
     public authService: AuthService,
-  ) { }
+  ) {}
 
   ngOnInit(): void {
-    const pollId = this.route.snapshot.paramMap.get('id');
-    if (pollId) {
-      this.loadPollDetails(+pollId);
+    const pollIdParam = this.route.snapshot.paramMap.get('id');
+    if (pollIdParam) {
+      this.pollId = +pollIdParam;
+      this.loadPollDetails(this.pollId);
+      this.setupSocketListeners(this.pollId);
     }
+  }
+
+  ngOnDestroy(): void {
+    if (this.pollId) {
+      this.pollService.stopListeningForVoteUpdates(
+        this.pollId,
+        this.voteUpdateCallback,
+      );
+    }
+  }
+
+  setupSocketListeners(pollId: number): void {
+    this.pollService.listenForVoteUpdates(pollId, this.voteUpdateCallback);
   }
 
   loadPollDetails(pollId: number): void {

@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
+import { SocketService } from './socket.service';
 
 export interface Poll {
   id: number;
@@ -32,7 +33,23 @@ export interface PollWithOptions extends Poll {
 export class PollService {
   private apiUrl = `${environment.apiUrl}/polls`;
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private socketService: SocketService,
+  ) {}
+
+  listenForVoteUpdates(
+    pollId: number,
+    callback: (updatedOptions: any) => void,
+  ) {
+    this.socketService.joinPollRoom(pollId);
+    this.socketService.onVoteUpdated(callback);
+  }
+
+  stopListeningForVoteUpdates(pollId: number, callback: (data: any) => void) {
+    this.socketService.leavePollRoom(pollId);
+    this.socketService.offVoteUpdated(callback);
+  }
 
   getAllPolls(): Observable<{ data: Poll[] }> {
     return this.http.get<{ data: Poll[] }>(this.apiUrl);
