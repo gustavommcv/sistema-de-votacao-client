@@ -8,6 +8,7 @@ Frontend do sistema de votação desenvolvido em Angular com integração em tem
 - RxJS
 - WebSockets (para atualizações em tempo real)
 - Flexbox CSS
+- Grid CSS
 - Sass
 
 ## Funcionalidades Implementadas
