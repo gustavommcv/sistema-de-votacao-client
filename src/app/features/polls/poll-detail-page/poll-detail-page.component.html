@@ -1,38 +1,51 @@
-<div class="poll-detail-container">
-  <div *ngIf="loading" class="loading">Carregando enquete...</div>
+<div class="poll-detail">
+  <div *ngIf="loading" class="poll-detail__loading">Carregando enquete...</div>
 
-  <div *ngIf="error" class="error">{{ error }}</div>
+  <div *ngIf="error" class="poll-detail__error">{{ error }}</div>
 
-  <div *ngIf="poll" class="poll-detail">
-    <h1>{{ poll.title }}</h1>
+  <div *ngIf="poll" class="poll-detail__content">
+    <h1 class="poll-detail__title">{{ poll.title }}</h1>
 
-    <div class="poll-meta">
+    <div class="poll-detail__meta">
       <span
-        class="status-badge"
-        [class.active]="isPollActive"
-        [class.inactive]="!isPollActive"
+        class="poll-detail__status"
+        [class.poll-detail__status--active]="isPollActive"
+        [class.poll-detail__status--inactive]="!isPollActive"
       >
         {{ isPollActive ? "Em andamento" : "Encerrada" }}
       </span>
-      <span>Início: {{ poll.start_date | date: "dd/MM/yyyy HH:mm" }}</span>
-      <span>Término: {{ poll.end_date | date: "dd/MM/yyyy HH:mm" }}</span>
-      <span>Criada por: {{ poll.user_email }}</span>
+      <span class="poll-detail__meta-item"
+        >Início: {{ poll.start_date | date: "dd/MM/yyyy HH:mm" }}</span
+      >
+      <span class="poll-detail__meta-item"
+        >Término: {{ poll.end_date | date: "dd/MM/yyyy HH:mm" }}</span
+      >
+      <span class="poll-detail__meta-item"
+        >Criada por: {{ poll.user_email }}</span
+      >
     </div>
 
-    <div class="poll-options">
-      <h2>Opções de resposta:</h2>
+    <div class="poll-detail__options">
+      <h2 class="poll-detail__options-title">Opções de resposta:</h2>
 
-      <div *ngIf="hasVoted" class="voted-message">
-        <i class="fas fa-check-circle"></i> Você já votou nesta enquete:
+      <div *ngIf="hasVoted" class="poll-detail__voted-message">
+        <i class="fas fa-check-circle poll-detail__voted-icon"></i> Você já
+        votou nesta enquete:
         <strong>{{ getSelectedOptionText() }}</strong>
         (Opção ID: {{ poll.user_vote }})
       </div>
 
-      <div *ngFor="let option of poll.options" class="option">
-        <label [class.selected]="hasVoted && option.id === poll.user_vote">
+      <div *ngFor="let option of poll.options" class="poll-detail__option">
+        <label
+          class="poll-detail__option-label"
+          [class.poll-detail__option-label--selected]="
+            hasVoted && option.id === poll.user_vote
+          "
+        >
           <input
             type="radio"
             name="pollOption"
+            class="poll-detail__option-input"
             [value]="option.id"
             [(ngModel)]="selectedOption"
             [disabled]="!isPollActive || !authService.isLoggedIn() || hasVoted"
@@ -40,18 +53,21 @@
           {{ option.text }}
           <span
             *ngIf="hasVoted && option.id === poll.user_vote"
-            class="your-vote"
+            class="poll-detail__your-vote"
           >
-            <i class="fas fa-check"></i> Seu voto
+            <i class="fas fa-check poll-detail__vote-icon"></i> Seu voto
           </span>
         </label>
-        <span class="votes-count">{{ option.votes_count }} votos</span>
+        <span class="poll-detail__votes-count"
+          >{{ option.votes_count }} votos</span
+        >
       </div>
     </div>
 
-    <div class="poll-actions">
+    <div class="poll-detail__actions">
       <ng-container *ngIf="authService.isLoggedIn(); else notLoggedIn">
         <app-button
+          class="poll-detail__vote-btn"
           (click)="submitVote()"
           [disabled]="!selectedOption || !isPollActive || hasVoted"
         >
@@ -60,19 +76,25 @@
       </ng-container>
 
       <ng-template #notLoggedIn>
-        <app-button (click)="router.navigate(['/login'])" class="login-to-vote">
+        <app-button
+          (click)="router.navigate(['/login'])"
+          class="poll-detail__login-btn"
+        >
           Faça login para votar
         </app-button>
       </ng-template>
 
       <ng-container *ngIf="authService.getCurrentUser()?.id === poll.user_id">
-        <app-button routerLink="/polls/{{ poll.id }}/edit" class="edit-button">
+        <app-button
+          routerLink="/polls/{{ poll.id }}/edit"
+          class="poll-detail__edit-btn"
+        >
           Editar Título
         </app-button>
         <app-button
           (click)="deletePoll()"
           [disabled]="isDeleting"
-          class="delete-btn"
+          class="poll-detail__delete-btn"
         >
           {{ isDeleting ? "Deletando..." : "Deletar Enquete" }}
         </app-button>

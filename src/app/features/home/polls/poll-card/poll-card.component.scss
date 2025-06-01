@@ -21,7 +21,7 @@
     font-size: 2rem;
   }
 
-  .poll-meta {
+  &__meta {
     display: flex;
     gap: 1rem;
     margin: 0.5rem 0;
@@ -29,31 +29,45 @@
     color: #666;
   }
 
-  .poll-actions {
+  &__meta-item {
+    @media screen and (max-width: 580px) {
+      & {
+        font-size: 1.2rem;
+      }
+    }
+  }
+
+  &__actions {
     margin-top: 1rem;
     display: flex;
     gap: 1rem;
   }
 
-  .poll-status {
+  &__action-btn {
+    &--edit {}
+
+    &--delete {}
+  }
+
+  &__status {
     padding: 0.5rem 1rem;
     border-radius: 20px;
     font-size: 1.4rem;
     font-weight: bold;
-  }
 
-  .status-not-started {
-    background-color: #ffc107;
-    color: #333;
-  }
+    &--not-started {
+      background-color: #ffc107;
+      color: #333;
+    }
 
-  .status-in-progress {
-    background-color: #28a745;
-    color: white;
-  }
+    &--in-progress {
+      background-color: #28a745;
+      color: white;
+    }
 
-  .status-finished {
-    background-color: #dc3545;
-    color: white;
+    &--finished {
+      background-color: #dc3545;
+      color: white;
+    }
   }
 }

@@ -1,46 +1,95 @@
-.container {
+.poll-edit {
   max-width: 600px;
   margin: 2rem auto;
   padding: 1rem;
-}
 
-h1 {
-  text-align: center;
-  margin-bottom: 1.5rem;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-
-  label {
-    display: block;
-    margin-bottom: 0.5rem;
+  &__title {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
   }
 
-  input {
+  &__loading {
+    text-align: center;
+    padding: 1rem;
+  }
+
+  &__form {}
+
+  &__form-group {
+    margin-bottom: 1rem;
+  }
+
+  &__label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    font-size: 1.8rem;
+  }
+
+  &__input {
     width: 100%;
     padding: 0.5rem;
     margin-bottom: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+
+    &:focus {
+      outline: none;
+      border-color: #3f51b5;
+    }
   }
-}
 
-.error {
-  color: red;
-  font-size: 0.875rem;
-}
+  &__error {
+    color: #dc3545;
+    font-size: 0.875rem;
+  }
 
-.error-message {
-  color: red;
-  margin: 1rem 0;
-}
+  &__error-message {
+    color: #dc3545;
+    margin: 1rem 0;
+    padding: 0.5rem;
+    background-color: #ffebee;
+    border-radius: 4px;
+  }
 
-.buttons {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
+  &__actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
 
-  button {
+  &__submit-btn {
     padding: 0.5rem 1rem;
+    background-color: #3f51b5;
+    color: white;
+    border: none;
+    border-radius: 4px;
     cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 1.5rem;
+
+    &:hover {
+      background-color: #303f9f;
+    }
+
+    &:disabled {
+      background-color: #9fa8da;
+      cursor: not-allowed;
+    }
+  }
+
+  &__cancel-btn {
+    padding: 0.5rem 1rem;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 1.5rem;
+
+    &:hover {
+      background-color: #e9ecef;
+    }
   }
 }

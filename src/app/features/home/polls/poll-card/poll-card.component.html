@@ -1,25 +1,34 @@
 <div class="poll-card">
   <div class="poll-card__header">
     <h3 class="poll-card__title">{{ poll.title }}</h3>
-    <span class="poll-status" [class]="'status-' + statusClass">{{
+    <span class="poll-card__status poll-card__status--{{ statusClass }}">{{
       status
     }}</span>
   </div>
-  <div class="poll-meta">
-    <span>Criado por: {{ poll.user_email }}</span>
-    <span>Início: {{ poll.start_date | date: "dd/MM/yyyy" }}</span>
-    <span>Término: {{ poll.end_date | date: "dd/MM/yyyy" }}</span>
+  <div class="poll-card__meta">
+    <span class="poll-card__meta-item">Criado por: {{ poll.user_email }}</span>
+    <span class="poll-card__meta-item"
+      >Início: {{ poll.start_date | date: "dd/MM/yyyy" }}</span
+    >
+    <span class="poll-card__meta-item"
+      >Término: {{ poll.end_date | date: "dd/MM/yyyy" }}</span
+    >
   </div>
-  <div class="poll-actions">
-    <app-button [routerLink]="['/polls', poll.id]">Ver detalhes</app-button>
+  <div class="poll-card__actions">
+    <app-button [routerLink]="['/polls', poll.id]" class="poll-card__action-btn"
+      >Ver detalhes</app-button
+    >
     @if (authService.getCurrentUser()?.id === poll.user_id) {
-      <app-button routerLink="/polls/{{ poll.id }}/edit" class="edit-button">
+      <app-button
+        routerLink="/polls/{{ poll.id }}/edit"
+        class="poll-card__action-btn poll-card__action-btn--edit"
+      >
         Editar Título
       </app-button>
       <app-button
         (click)="deletePoll(poll.id, $event)"
         [disabled]="isDeleting"
-        class="delete-btn"
+        class="poll-card__action-btn poll-card__action-btn--delete"
       >
         {{ isDeleting ? "Deletando..." : "Deletar" }}
       </app-button>

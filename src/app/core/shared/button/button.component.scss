@@ -19,4 +19,11 @@
     cursor: not-allowed;
     background-color: #6c757d;
   }
+
+  @media screen and (max-width: 580px) {
+    font-size: 1.5rem;
+  }
+  @media screen and (max-width: 470px) {
+    font-size: 1.2rem;
+  }
 }

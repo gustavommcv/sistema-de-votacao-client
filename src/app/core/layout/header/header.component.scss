@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 0;
+  padding: 1rem;
 
   &-container {
     align-items: center;
@@ -36,5 +36,21 @@
 
   &__route {
     font-size: 1.5rem;
+  }
+
+  @media screen and (max-width: 580px) {
+    &__logo {
+      &-container {
+        max-width: 5rem;
+      }
+    }
+
+    &__title {
+      font-size: 2rem;
+    }
+
+    &__route {
+      display: none;
+    }
   }
 }

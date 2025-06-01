@@ -1,25 +1,28 @@
-.home-page {
+.home {
   max-width: 800px;
   margin: 2rem auto;
   padding: 0 1rem;
 
   &__title {
     text-align: center;
+    margin-top: 4rem;
     margin-bottom: 2rem;
     font-size: 2rem;
   }
 
-  .loading, .error, .no-polls {
+  &__loading,
+  &__error,
+  &__empty-message {
     text-align: center;
     padding: 2rem;
     font-size: 1.2rem;
   }
 
-  .error {
+  &__error {
     color: #dc3545;
   }
 
-  .poll-list {
+  &__poll-list {
     display: grid;
     gap: 1.5rem;
   }

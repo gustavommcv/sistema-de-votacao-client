@@ -1,21 +1,24 @@
-<div class="login-container">
-  <div class="login-card">
-    <img src="/icon.png" alt="Logo" class="logo" />
-    <h2>Login</h2>
+<div class="login">
+  <div class="login__card">
+    <img src="/icon.png" alt="Logo" class="login__logo" />
+    <h2 class="login__title">Login</h2>
 
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      <div class="form-group">
-        <label for="email">Email</label>
+    <form class="login__form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="login__form-group">
+        <label for="email" class="login__label">Email</label>
         <input
           type="email"
           id="email"
           formControlName="email"
           placeholder="seu@email.com"
-          [class.invalid]="email?.invalid && (email?.dirty || email?.touched)"
+          class="login__input"
+          [class.login__input--invalid]="
+            email?.invalid && (email?.dirty || email?.touched)
+          "
         />
 
         @if (email?.invalid && (email?.dirty || email?.touched)) {
-          <div class="error-message">
+          <div class="login__error-message">
             @if (email?.errors?.["required"]) {
               Email é obrigatório
             }
@@ -26,20 +29,21 @@
         }
       </div>
 
-      <div class="form-group">
-        <label for="password">Senha</label>
+      <div class="login__form-group">
+        <label for="password" class="login__label">Senha</label>
         <input
           type="password"
           id="password"
           formControlName="password"
           placeholder="••••••"
-          [class.invalid]="
+          class="login__input"
+          [class.login__input--invalid]="
             password?.invalid && (password?.dirty || password?.touched)
           "
         />
 
         @if (password?.invalid && (password?.dirty || password?.touched)) {
-          <div class="error-message">
+          <div class="login__error-message">
             @if (password?.errors?.["required"]) {
               Senha é obrigatória
             }
@@ -51,14 +55,14 @@
       </div>
 
       @if (errorMessage) {
-        <div class="error-message server-error">
+        <div class="login__error-message login__error-message--server">
           {{ errorMessage }}
         </div>
       }
 
       <button
         type="submit"
-        class="login-button"
+        class="login__button"
         [disabled]="loginForm.invalid || isLoading"
       >
         @if (isLoading) {
@@ -69,8 +73,8 @@
       </button>
     </form>
 
-    <div class="footer-links">
-      <a routerLink="/signup">Criar nova conta</a>
+    <div class="login__footer">
+      <a routerLink="/signup" class="login__link">Criar nova conta</a>
     </div>
   </div>
 </div>
