@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, catchError, Observable, tap, throwError } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +16,10 @@ export class AuthService {
   isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
   currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+  ) {
     this.checkAuth().subscribe();
   }
 
@@ -44,8 +48,19 @@ export class AuthService {
         }),
       );
   }
+
   signup(email: string, password: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/auth/signup`, { email, password });
+    return this.http
+      .post(
+        `${this.apiUrl}/auth/signup`,
+        { email, password },
+        { withCredentials: true },
+      )
+      .pipe(
+        tap(() => {
+          this.router.navigate(['/login']);
+        }),
+      );
   }
 
   checkAuth(): Observable<any> {

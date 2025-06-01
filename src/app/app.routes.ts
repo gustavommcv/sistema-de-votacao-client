@@ -4,6 +4,7 @@ import { LoginPageComponent } from './features/auth/login-page/login-page.compon
 import { PollDetailPageComponent } from './features/polls/poll-detail-page/poll-detail-page.component';
 import { PollCreatePageComponent } from './features/polls/poll-create-page/poll-create-page.component';
 import { PollEditPageComponent } from './features/polls/poll-edit-page/poll-edit-page.component';
+import { SignupPageComponent } from './features/auth/signup-page/signup-page.component';
 
 export const routes: Routes = [
   {
@@ -15,6 +16,11 @@ export const routes: Routes = [
     path: 'login',
     component: LoginPageComponent,
     title: 'Login - Sistema de Votação',
+  },
+  {
+    path: 'signup',
+    component: SignupPageComponent,
+    title: 'Registrar - Sistema de Votação',
   },
   {
     path: 'polls/create',
