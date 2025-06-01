@@ -40,7 +40,6 @@ export class PollDetailPageComponent implements OnInit {
   loadPollDetails(pollId: number): void {
     this.pollService.getPollById(pollId).subscribe({
       next: (response) => {
-        console.log(response.data);
         this.poll = response.data;
         this.checkPollStatus();
 
@@ -52,13 +51,6 @@ export class PollDetailPageComponent implements OnInit {
         } else {
           this.selectedOption = null;
         }
-
-        console.log('Dados da enquete:', {
-          poll: this.poll,
-          hasVoted: this.hasVoted,
-          user_vote: this.poll.user_vote,
-          selectedOption: this.selectedOption,
-        });
 
         this.loading = false;
       },

@@ -37,8 +37,6 @@ export class LoginPageComponent {
       .login(email!, password!)
       .pipe(
         catchError((error) => {
-          console.log('Erro completo:', error);
-
           if (error.error?.errors?.length > 0) {
             this.errorMessage = error.error.errors[0].msg;
           } else if (error.error?.message) {
