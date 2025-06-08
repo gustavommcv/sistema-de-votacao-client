@@ -2,6 +2,8 @@
 
 Frontend do sistema de votação desenvolvido em Angular com integração em tempo real.
 
+[Link Backend](https://github.com/gustavommcv/sistema-de-votacao-api)
+
 ## Tecnologias Utilizadas
 - Angular
 - TypeScript
