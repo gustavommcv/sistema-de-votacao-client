@@ -1,21 +1,29 @@
 <section class="home">
   @if (authService.isAuthenticated$ | async) {
-    <app-button routerLink="/polls/create" class="home__create-btn">
+    <app-button [isLink]="true" route="/polls/create" class="home__create-btn">
       Criar Enquete
     </app-button>
   }
 
   <h2 class="home__title">Enquetes Disponíveis</h2>
 
-  <div *ngIf="loading" class="home__loading">Carregando enquetes...</div>
+  @if (loading) {
+    <div class="home__loading">Carregando enquetes...</div>
+  }
 
-  <div *ngIf="error" class="home__error">{{ error }}</div>
+  @if (error) {
+    <div class="home__error">{{ error }}</div>
+  }
 
   <div class="home__poll-list">
-    <app-poll-card *ngFor="let poll of polls" [poll]="poll"></app-poll-card>
+    @for (poll of polls; track poll.id) {
+      <app-poll-card [poll]="poll" (pollDeleted)="removePoll($event)" />
+    }
   </div>
 
-  <div *ngIf="!loading && polls.length === 0" class="home__empty-message">
-    Nenhuma enquete disponível no momento.
-  </div>
+  @if (!loading && polls.length === 0) {
+    <div class="home__empty-message">
+      Nenhuma enquete disponível no momento.
+    </div>
+  }
 </section>

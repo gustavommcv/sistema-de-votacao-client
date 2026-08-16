@@ -1,16 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ButtonComponent } from '../../../core/shared/button/button.component';
-import { CommonModule } from '@angular/common';
+
 import { ReactiveFormsModule } from '@angular/forms';
+import { finalize } from 'rxjs';
+import { getApiErrorMessage } from '../../../core/http/api-error';
 
 @Component({
   selector: 'app-signup-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ButtonComponent, RouterLink],
+  imports: [ReactiveFormsModule, ButtonComponent, RouterLink],
   templateUrl: './signup-page.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./signup-page.component.scss'],
 })
 export class SignupPageComponent {
@@ -29,7 +32,7 @@ export class SignupPageComponent {
         '',
         [
           Validators.required,
-          Validators.minLength(3),
+          Validators.minLength(8),
           Validators.maxLength(100),
         ],
       ],
@@ -37,10 +40,13 @@ export class SignupPageComponent {
     });
   }
 
-  onSubmit() {
-    if (this.signupForm.invalid) return;
+  onSubmit(): void {
+    if (this.signupForm.invalid) {
+      this.signupForm.markAllAsTouched();
+      return;
+    }
 
-    const { email, password, confirmPassword } = this.signupForm.value;
+    const { email, password, confirmPassword } = this.signupForm.getRawValue();
 
     if (password !== confirmPassword) {
       this.error = 'As senhas não coincidem';
@@ -50,13 +56,14 @@ export class SignupPageComponent {
     this.loading = true;
     this.error = null;
 
-    this.authService.signup(email, password).subscribe({
+    this.authService.signup(email, password).pipe(finalize(() => {
+      this.loading = false;
+    })).subscribe({
       next: () => {
-        this.router.navigate(['/']);
+        this.router.navigate(['/login']);
       },
-      error: (err) => {
-        this.loading = false;
-        this.error = err.message || 'Erro ao cadastrar usuário';
+      error: (requestError: unknown) => {
+        this.error = getApiErrorMessage(requestError, 'Erro ao cadastrar usuário');
       },
     });
   }

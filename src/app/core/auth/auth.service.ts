@@ -1,89 +1,76 @@
-import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, catchError, Observable, tap, throwError } from 'rxjs';
-import { Router } from '@angular/router';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, catchError, firstValueFrom, Observable, of, tap } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import type { ApiMessage } from '../models/api.model';
+import type { LoginResponse, SessionResponse, SignupResponse, User } from '../models/user.model';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = environment.apiUrl;
+  private readonly apiUrl = environment.apiUrl;
+  private readonly isAuthenticatedSubject = new BehaviorSubject(false);
+  private readonly currentUserSubject = new BehaviorSubject<User | null>(null);
 
-  private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
-  private currentUserSubject = new BehaviorSubject<any>(null);
+  readonly isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
+  readonly currentUser$ = this.currentUserSubject.asObservable();
 
-  isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
-  currentUser$ = this.currentUserSubject.asObservable();
+  constructor(private readonly http: HttpClient) {}
 
-  constructor(
-    private http: HttpClient,
-    private router: Router,
-  ) {
-    this.checkAuth().subscribe();
+  async initialize(): Promise<void> {
+    await firstValueFrom(this.checkAuth());
   }
 
-  login(email: string, password: string): Observable<any> {
+  login(email: string, password: string): Observable<LoginResponse> {
     return this.http
-      .post(
-        `${this.apiUrl}/auth/login`,
-        { email, password },
-        { withCredentials: true },
-      )
-      .pipe(
-        tap((response: any) => {
-          this.isAuthenticatedSubject.next(true);
-          this.currentUserSubject.next(response.loggedIn);
-        }),
-      );
+      .post<LoginResponse>(`${this.apiUrl}/auth/login`, { email, password })
+      .pipe(tap(({ loggedIn }) => this.setSession(loggedIn)));
   }
 
-  logout(): Observable<any> {
-    return this.http
-      .get(`${this.apiUrl}/auth/logout`, { withCredentials: true })
-      .pipe(
-        tap(() => {
-          this.isAuthenticatedSubject.next(false);
-          this.currentUserSubject.next(null);
-        }),
-      );
+  logout(): Observable<ApiMessage> {
+    return this.http.get<ApiMessage>(`${this.apiUrl}/auth/logout`).pipe(
+      tap(() => this.clearSession()),
+      catchError((error: unknown) => {
+        this.clearSession();
+        throw error;
+      }),
+    );
   }
 
-  signup(email: string, password: string): Observable<any> {
-    return this.http
-      .post(
-        `${this.apiUrl}/auth/signup`,
-        { email, password },
-        { withCredentials: true },
-      )
-      .pipe(
-        tap(() => {
-          this.router.navigate(['/login']);
-        }),
-      );
+  signup(email: string, password: string): Observable<SignupResponse> {
+    return this.http.post<SignupResponse>(`${this.apiUrl}/auth/signup`, {
+      email,
+      password,
+    });
   }
 
-  checkAuth(): Observable<any> {
-    return this.http
-      .get(`${this.apiUrl}/users/isLoggedIn`, { withCredentials: true })
-      .pipe(
-        tap((response: any) => {
-          this.isAuthenticatedSubject.next(response.authenticated);
-          this.currentUserSubject.next(response.user || null);
-        }),
-        catchError((error) => {
-          this.isAuthenticatedSubject.next(false);
-          this.currentUserSubject.next(null);
-          return throwError(() => error);
-        }),
-      );
+  checkAuth(): Observable<SessionResponse> {
+    return this.http.get<SessionResponse>(`${this.apiUrl}/users/isLoggedIn`).pipe(
+      tap((response) => {
+        if (response.authenticated && response.user) this.setSession(response.user);
+        else this.clearSession();
+      }),
+      catchError(() => {
+        this.clearSession();
+        return of({ authenticated: false });
+      }),
+    );
   }
 
   isLoggedIn(): boolean {
     return this.isAuthenticatedSubject.value;
   }
 
-  getCurrentUser(): any {
+  getCurrentUser(): User | null {
     return this.currentUserSubject.value;
+  }
+
+  private setSession(user: User): void {
+    this.isAuthenticatedSubject.next(true);
+    this.currentUserSubject.next(user);
+  }
+
+  private clearSession(): void {
+    this.isAuthenticatedSubject.next(false);
+    this.currentUserSubject.next(null);
   }
 }

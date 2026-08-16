@@ -1,16 +1,19 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '../../../core/shared/button/button.component';
 import { PollService, PollWithOptions } from '../../../core/polls/poll.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { getPollStatus, type PollStatus, type VoteUpdatedEvent } from '../../../core/models/poll.model';
+import { getApiErrorMessage } from '../../../core/http/api-error';
 
 @Component({
   selector: 'app-poll-detail-page',
   standalone: true,
-  imports: [CommonModule, DatePipe, ButtonComponent, FormsModule, RouterLink],
+  imports: [CommonModule, DatePipe, ButtonComponent, FormsModule],
   templateUrl: './poll-detail-page.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./poll-detail-page.component.scss'],
 })
 export class PollDetailPageComponent implements OnInit, OnDestroy {
@@ -21,10 +24,10 @@ export class PollDetailPageComponent implements OnInit, OnDestroy {
   isPollActive = false;
   isDeleting = false;
   hasVoted = false;
-  pollStatus: 'not-started' | 'in-progress' | 'finished' = 'not-started';
+  pollStatus: PollStatus = 'not-started';
 
   private pollId!: number;
-  private voteUpdateCallback = (data: any) => {
+  private readonly voteUpdateCallback = (data: VoteUpdatedEvent): void => {
     if (data.pollId === this.pollId && this.poll) {
       this.poll.options = data.options;
 
@@ -86,29 +89,16 @@ export class PollDetailPageComponent implements OnInit, OnDestroy {
 
         this.loading = false;
       },
-      error: (err) => {
+      error: () => {
         this.error = 'Erro ao carregar enquete';
         this.loading = false;
-        console.error(err);
       },
     });
   }
 
   checkPollStatus(): void {
-    const now = new Date();
-    const startDate = new Date(this.poll.start_date);
-    const endDate = new Date(this.poll.end_date);
-
-    if (now < startDate) {
-      this.pollStatus = 'not-started';
-      this.isPollActive = false;
-    } else if (now >= startDate && now <= endDate) {
-      this.pollStatus = 'in-progress';
-      this.isPollActive = true;
-    } else {
-      this.pollStatus = 'finished';
-      this.isPollActive = false;
-    }
+    this.pollStatus = getPollStatus(this.poll);
+    this.isPollActive = this.pollStatus === 'in-progress';
   }
 
   getStatusText(): string {
@@ -146,16 +136,8 @@ export class PollDetailPageComponent implements OnInit, OnDestroy {
         this.hasVoted = true;
         this.loadPollDetails(this.poll.id);
       },
-      error: (err) => {
-        console.error('Erro ao votar:', err);
-        if (err.status === 401) {
-          this.error = 'Sua sessão expirou. Faça login novamente.';
-          this.authService.logout().subscribe(() => {
-            this.router.navigate(['/login']);
-          });
-        } else {
-          this.error = 'Erro ao votar. Tente novamente.';
-        }
+      error: (requestError: unknown) => {
+        this.error = getApiErrorMessage(requestError, 'Erro ao votar. Tente novamente.');
       },
     });
   }
@@ -174,10 +156,9 @@ export class PollDetailPageComponent implements OnInit, OnDestroy {
       next: () => {
         this.router.navigate(['/']);
       },
-      error: (err) => {
-        console.error('Erro ao deletar enquete:', err);
+      error: (requestError: unknown) => {
         this.isDeleting = false;
-        this.error = 'Erro ao deletar enquete';
+        this.error = getApiErrorMessage(requestError, 'Erro ao deletar enquete');
       },
     });
   }

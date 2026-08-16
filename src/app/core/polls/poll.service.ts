@@ -1,96 +1,53 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import type { ApiMessage, ApiResponse } from '../models/api.model';
+import type { CreatePollRequest, Poll, PollWithOptions, VoteUpdatedEvent } from '../models/poll.model';
 import { SocketService } from './socket.service';
 
-export interface Poll {
-  id: number;
-  title: string;
-  start_date: string;
-  end_date: string;
-  user_id: number;
-  user_email?: string;
-  links: {
-    self: { method: string; href: string };
-    vote: { method: string; href: string };
-    results: { method: string; href: string };
-  };
-}
+export type { Poll, PollWithOptions } from '../models/poll.model';
 
-export interface PollWithOptions extends Poll {
-  options: {
-    id: number;
-    text: string;
-    votes_count: number;
-  }[];
-  user_vote: number | null;
-}
-
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class PollService {
-  private apiUrl = `${environment.apiUrl}/polls`;
+  private readonly apiUrl = `${environment.apiUrl}/polls`;
 
   constructor(
-    private http: HttpClient,
-    private socketService: SocketService,
+    private readonly http: HttpClient,
+    private readonly socketService: SocketService,
   ) {}
 
-  listenForVoteUpdates(
-    pollId: number,
-    callback: (updatedOptions: any) => void,
-  ) {
+  listenForVoteUpdates(pollId: number, callback: (event: VoteUpdatedEvent) => void): void {
     this.socketService.joinPollRoom(pollId);
     this.socketService.onVoteUpdated(callback);
   }
 
-  stopListeningForVoteUpdates(pollId: number, callback: (data: any) => void) {
+  stopListeningForVoteUpdates(pollId: number, callback: (event: VoteUpdatedEvent) => void): void {
     this.socketService.leavePollRoom(pollId);
     this.socketService.offVoteUpdated(callback);
   }
 
-  getAllPolls(): Observable<{ data: Poll[] }> {
-    return this.http.get<{ data: Poll[] }>(this.apiUrl);
+  getAllPolls(): Observable<ApiResponse<Poll[]>> {
+    return this.http.get<ApiResponse<Poll[]>>(this.apiUrl);
   }
 
-  getPollById(id: number): Observable<{ data: PollWithOptions }> {
-    return this.http.get<{ data: PollWithOptions }>(`${this.apiUrl}/${id}`, {
-      withCredentials: true,
-    });
+  getPollById(id: number): Observable<ApiResponse<PollWithOptions>> {
+    return this.http.get<ApiResponse<PollWithOptions>>(`${this.apiUrl}/${id}`);
   }
 
-  vote(pollId: number, optionId: number): Observable<any> {
-    return this.http.post(
-      `${this.apiUrl}/${pollId}/vote`,
-      { option_id: optionId },
-      { withCredentials: true },
-    );
+  vote(pollId: number, optionId: number): Observable<ApiMessage> {
+    return this.http.post<ApiMessage>(`${this.apiUrl}/${pollId}/vote`, { option_id: optionId });
   }
 
-  createPoll(pollData: {
-    title: string;
-    start_date: string;
-    end_date: string;
-    options: string[];
-  }): Observable<any> {
-    return this.http.post(`${this.apiUrl}`, pollData, {
-      withCredentials: true,
-    });
+  createPoll(poll: CreatePollRequest): Observable<ApiResponse<Poll>> {
+    return this.http.post<ApiResponse<Poll>>(this.apiUrl, poll);
   }
 
-  deletePoll(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`, {
-      withCredentials: true,
-    });
+  deletePoll(id: number): Observable<ApiMessage> {
+    return this.http.delete<ApiMessage>(`${this.apiUrl}/${id}`);
   }
 
-  updatePollTitle(pollId: number, title: string): Observable<any> {
-    return this.http.patch(
-      `${this.apiUrl}/${pollId}/title`,
-      { title },
-      { withCredentials: true },
-    );
+  updatePollTitle(pollId: number, title: string): Observable<ApiMessage> {
+    return this.http.patch<ApiMessage>(`${this.apiUrl}/${pollId}/title`, { title });
   }
 }

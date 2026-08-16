@@ -1,7 +1,7 @@
 .app-button {
-  background-color: #d01216;
+  background-color: var(--color-brand);
   border: none;
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   padding: 1rem 2rem;
   text-decoration: none;
   color: white;

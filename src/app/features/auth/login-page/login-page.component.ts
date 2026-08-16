@@ -1,15 +1,17 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 import { Router, RouterLink } from '@angular/router';
-import { catchError, finalize, throwError } from 'rxjs';
+import { finalize } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
+import { getApiErrorMessage } from '../../../core/http/api-error';
 
 @Component({
   selector: 'app-login-page',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './login-page.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./login-page.component.scss'],
 })
 export class LoginPageComponent {
@@ -19,37 +21,26 @@ export class LoginPageComponent {
 
   loginForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(3)]],
+    password: ['', [Validators.required, Validators.minLength(8)]],
   });
 
   isLoading = false;
   errorMessage = '';
 
-  onSubmit() {
-    if (this.loginForm.invalid) return;
+  onSubmit(): void {
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
+    }
 
     this.isLoading = true;
     this.errorMessage = '';
 
-    const { email, password } = this.loginForm.value;
+    const { email, password } = this.loginForm.getRawValue();
 
     this.authService
-      .login(email!, password!)
+      .login(email ?? '', password ?? '')
       .pipe(
-        catchError((error) => {
-          if (error.error?.errors?.length > 0) {
-            this.errorMessage = error.error.errors[0].msg;
-          } else if (error.error?.message) {
-            this.errorMessage = error.error.message;
-          } else if (error.status === 401) {
-            this.errorMessage = 'Email ou senha incorretos';
-          } else {
-            this.errorMessage =
-              'Ocorreu um erro inesperado. Tente novamente mais tarde.';
-          }
-
-          return throwError(() => error);
-        }),
         finalize(() => {
           this.isLoading = false;
         }),
@@ -58,7 +49,12 @@ export class LoginPageComponent {
         next: () => {
           this.router.navigate(['/']);
         },
-        error: () => { },
+        error: (error: unknown) => {
+          this.errorMessage = getApiErrorMessage(
+            error,
+            'Não foi possível entrar. Tente novamente.',
+          );
+        },
       });
   }
 

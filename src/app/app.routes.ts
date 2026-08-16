@@ -1,40 +1,56 @@
 import { Routes } from '@angular/router';
-import { HomePageComponent } from './features/home/home-page/home-page.component';
-import { LoginPageComponent } from './features/auth/login-page/login-page.component';
-import { PollDetailPageComponent } from './features/polls/poll-detail-page/poll-detail-page.component';
-import { PollCreatePageComponent } from './features/polls/poll-create-page/poll-create-page.component';
-import { PollEditPageComponent } from './features/polls/poll-edit-page/poll-edit-page.component';
-import { SignupPageComponent } from './features/auth/signup-page/signup-page.component';
+import { authGuard } from './core/auth/auth.guard';
 
 export const routes: Routes = [
   {
     path: '',
-    component: HomePageComponent,
+    loadComponent: () =>
+      import('./features/home/home-page/home-page.component').then(
+        (module) => module.HomePageComponent,
+      ),
     title: 'Sistema de Votação',
   },
   {
     path: 'login',
-    component: LoginPageComponent,
+    loadComponent: () =>
+      import('./features/auth/login-page/login-page.component').then(
+        (module) => module.LoginPageComponent,
+      ),
     title: 'Login - Sistema de Votação',
   },
   {
     path: 'signup',
-    component: SignupPageComponent,
+    loadComponent: () =>
+      import('./features/auth/signup-page/signup-page.component').then(
+        (module) => module.SignupPageComponent,
+      ),
     title: 'Registrar - Sistema de Votação',
   },
   {
     path: 'polls/create',
-    component: PollCreatePageComponent,
-    title: 'Sistema de Votação',
+    loadComponent: () =>
+      import('./features/polls/poll-create-page/poll-create-page.component').then(
+        (module) => module.PollCreatePageComponent,
+      ),
+    canActivate: [authGuard],
+    title: 'Criar enquete - Sistema de Votação',
   },
   {
     path: 'polls/:id',
-    component: PollDetailPageComponent,
-    title: 'Sistema de Votação',
+    loadComponent: () =>
+      import('./features/polls/poll-detail-page/poll-detail-page.component').then(
+        (module) => module.PollDetailPageComponent,
+      ),
+    title: 'Enquete - Sistema de Votação',
   },
   {
     path: 'polls/:id/edit',
-    component: PollEditPageComponent,
-    title: 'Sistema de Votação',
+    loadComponent: () =>
+      import('./features/polls/poll-edit-page/poll-edit-page.component').then(
+        (module) => module.PollEditPageComponent,
+      ),
+    canActivate: [authGuard],
+    title: 'Editar enquete - Sistema de Votação',
   },
+  { path: '**', redirectTo: '' },
 ];

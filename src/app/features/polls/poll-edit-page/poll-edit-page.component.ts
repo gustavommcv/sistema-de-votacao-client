@@ -1,15 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PollService } from '../../../core/polls/poll.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { getApiErrorMessage } from '../../../core/http/api-error';
 
 @Component({
   selector: 'app-poll-edit-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [FormsModule, ReactiveFormsModule],
   templateUrl: './poll-edit-page.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./poll-edit-page.component.scss'],
 })
 export class PollEditPageComponent implements OnInit {
@@ -60,14 +62,14 @@ export class PollEditPageComponent implements OnInit {
     this.error = null;
 
     this.pollService
-      .updatePollTitle(this.pollId, this.editForm.value.title)
+      .updatePollTitle(this.pollId, this.editForm.getRawValue().title)
       .subscribe({
         next: () => {
           this.router.navigate(['/polls', this.pollId]);
         },
-        error: (err) => {
+        error: (requestError: unknown) => {
           this.saving = false;
-          this.error = err.error?.error || 'Erro ao atualizar enquete';
+          this.error = getApiErrorMessage(requestError, 'Erro ao atualizar enquete');
         },
       });
   }

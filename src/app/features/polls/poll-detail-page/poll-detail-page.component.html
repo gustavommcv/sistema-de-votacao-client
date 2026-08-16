@@ -1,106 +1,109 @@
 <div class="poll-detail">
-  <div *ngIf="loading" class="poll-detail__loading">Carregando enquete...</div>
+  @if (loading) {
+    <div class="poll-detail__loading">Carregando enquete...</div>
+  }
 
-  <div *ngIf="error" class="poll-detail__error">{{ error }}</div>
+  @if (error) {
+    <div class="poll-detail__error">{{ error }}</div>
+  }
 
-  <div *ngIf="poll" class="poll-detail__content">
-    <h1 class="poll-detail__title">{{ poll.title }}</h1>
-
-    <div class="poll-detail__meta">
-      <span
-        class="poll-detail__status"
-        [class.poll-detail__status--not-started]="pollStatus === 'not-started'"
-        [class.poll-detail__status--in-progress]="pollStatus === 'in-progress'"
-        [class.poll-detail__status--finished]="pollStatus === 'finished'"
-      >
-        {{ getStatusText() }}
-      </span>
-
-      <span class="poll-detail__meta-item"
-        >Início: {{ poll.start_date | date: "dd/MM/yyyy HH:mm" }}</span
-      >
-      <span class="poll-detail__meta-item"
-        >Término: {{ poll.end_date | date: "dd/MM/yyyy HH:mm" }}</span
-      >
-      <span class="poll-detail__meta-item"
-        >Criada por: {{ poll.user_email }}</span
-      >
-    </div>
-
-    <div class="poll-detail__options">
-      <h2 class="poll-detail__options-title">Opções de resposta:</h2>
-
-      <div *ngIf="hasVoted" class="poll-detail__voted-message">
-        <i class="fas fa-check-circle poll-detail__voted-icon"></i> Você já
-        votou nesta enquete:
-        <strong>{{ getSelectedOptionText() }}</strong>
-        (Opção ID: {{ poll.user_vote }})
-      </div>
-
-      <div *ngFor="let option of poll.options" class="poll-detail__option">
-        <label
-          class="poll-detail__option-label"
+  @if (poll) {
+    <div class="poll-detail__content">
+      <h1 class="poll-detail__title">{{ poll.title }}</h1>
+      <div class="poll-detail__meta">
+        <span
+          class="poll-detail__status"
+          [class.poll-detail__status--not-started]="pollStatus === 'not-started'"
+          [class.poll-detail__status--in-progress]="pollStatus === 'in-progress'"
+          [class.poll-detail__status--finished]="pollStatus === 'finished'"
+          >
+          {{ getStatusText() }}
+        </span>
+        <span class="poll-detail__meta-item"
+          >Início: {{ poll.start_date | date: "dd/MM/yyyy HH:mm" }}</span
+          >
+          <span class="poll-detail__meta-item"
+            >Término: {{ poll.end_date | date: "dd/MM/yyyy HH:mm" }}</span
+            >
+            <span class="poll-detail__meta-item"
+              >Criada por: {{ poll.user_email }}</span
+              >
+            </div>
+            <div class="poll-detail__options">
+              <h2 class="poll-detail__options-title">Opções de resposta:</h2>
+              @if (hasVoted) {
+                <div class="poll-detail__voted-message">
+                  <i class="fas fa-check-circle poll-detail__voted-icon"></i> Você já
+                  votou nesta enquete:
+                  <strong>{{ getSelectedOptionText() }}</strong>
+                  (Opção ID: {{ poll.user_vote }})
+                </div>
+              }
+              @for (option of poll.options; track option) {
+                <div class="poll-detail__option">
+                  <label
+                    class="poll-detail__option-label"
           [class.poll-detail__option-label--selected]="
             hasVoted && option.id === poll.user_vote
           "
-        >
-          <input
-            type="radio"
-            name="pollOption"
-            class="poll-detail__option-input"
-            [value]="option.id"
-            [(ngModel)]="selectedOption"
-            [disabled]="!isPollActive || !authService.isLoggedIn() || hasVoted"
-          />
-          {{ option.text }}
-          <span
-            *ngIf="hasVoted && option.id === poll.user_vote"
-            class="poll-detail__your-vote"
-          >
-            <i class="fas fa-check poll-detail__vote-icon"></i> Seu voto
-          </span>
-        </label>
-        <span class="poll-detail__votes-count"
-          >{{ option.votes_count }} votos</span
-        >
-      </div>
-    </div>
-
-    <div class="poll-detail__actions">
-      <ng-container *ngIf="authService.isLoggedIn(); else notLoggedIn">
-        <app-button
-          class="poll-detail__vote-btn"
-          (click)="submitVote()"
-          [disabled]="!selectedOption || !isPollActive || hasVoted"
-        >
-          {{ hasVoted ? "Voto Registrado" : "Votar" }}
-        </app-button>
-      </ng-container>
-
-      <ng-template #notLoggedIn>
-        <app-button
-          (click)="router.navigate(['/login'])"
-          class="poll-detail__login-btn"
-        >
-          Faça login para votar
-        </app-button>
-      </ng-template>
-
-      <ng-container *ngIf="authService.getCurrentUser()?.id === poll.user_id">
-        <app-button
-          routerLink="/polls/{{ poll.id }}/edit"
-          class="poll-detail__edit-btn"
-        >
-          Editar Título
-        </app-button>
-        <app-button
-          (click)="deletePoll()"
-          [disabled]="isDeleting"
-          class="poll-detail__delete-btn"
-        >
-          {{ isDeleting ? "Deletando..." : "Deletar Enquete" }}
-        </app-button>
-      </ng-container>
-    </div>
-  </div>
-</div>
+                    >
+                    <input
+                      type="radio"
+                      name="pollOption"
+                      class="poll-detail__option-input"
+                      [value]="option.id"
+                      [(ngModel)]="selectedOption"
+                      [disabled]="!isPollActive || !authService.isLoggedIn() || hasVoted"
+                      />
+                      {{ option.text }}
+                      @if (hasVoted && option.id === poll.user_vote) {
+                        <span
+                          class="poll-detail__your-vote"
+                          >
+                          <i class="fas fa-check poll-detail__vote-icon"></i> Seu voto
+                        </span>
+                      }
+                    </label>
+                    <span class="poll-detail__votes-count"
+                      >{{ option.votes_count }} votos</span
+                      >
+                    </div>
+                  }
+                </div>
+                <div class="poll-detail__actions">
+                  @if (authService.isLoggedIn()) {
+                    <app-button
+                      class="poll-detail__vote-btn"
+                      (click)="submitVote()"
+                      [disabled]="!selectedOption || !isPollActive || hasVoted"
+                      >
+                      {{ hasVoted ? "Voto Registrado" : "Votar" }}
+                    </app-button>
+                  } @else {
+                    <app-button
+                      (click)="router.navigate(['/login'])"
+                      class="poll-detail__login-btn"
+                      >
+                      Faça login para votar
+                    </app-button>
+                  }
+                  @if (authService.getCurrentUser()?.id === poll.user_id) {
+                    <app-button
+                      [isLink]="true"
+                      [route]="['/polls', poll.id, 'edit']"
+                      class="poll-detail__edit-btn"
+                      >
+                      Editar Título
+                    </app-button>
+                    <app-button
+                      (click)="deletePoll()"
+                      [disabled]="isDeleting"
+                      class="poll-detail__delete-btn"
+                      >
+                      {{ isDeleting ? "Deletando..." : "Deletar Enquete" }}
+                    </app-button>
+                  }
+                </div>
+              </div>
+            }
+          </div>

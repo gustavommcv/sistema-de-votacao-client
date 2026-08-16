@@ -8,6 +8,17 @@
   -webkit-tap-highlight-color: transparent; // Removes blue background when a button is clicked
 }
 
+:root {
+  color-scheme: light;
+  --color-brand: #d01216;
+  --color-text: #151314;
+  --color-surface: #ffffff;
+  --color-background: #fafafa;
+  --color-border: #dddddd;
+  --radius-sm: 5px;
+  --radius-md: 8px;
+}
+
 html {
   font-size: 10px;
   font-family: "Inter", sans-serif;
@@ -17,5 +28,19 @@ html {
 }
 
 body {
-  height: 100dvh;
+  min-height: 100dvh;
+  color: var(--color-text);
+  background: var(--color-background);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid rgba(208, 18, 22, 0.35);
+  outline-offset: 2px;
 }

@@ -1,7 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ChangeDetectionStrategy } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { Poll } from '../../../../core/polls/poll.service';
-import { RouterLink } from '@angular/router';
+import { getPollStatus, type Poll } from '../../../../core/models/poll.model';
 import { ButtonComponent } from '../../../../core/shared/button/button.component';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { PollService } from '../../../../core/polls/poll.service';
@@ -9,12 +8,14 @@ import { PollService } from '../../../../core/polls/poll.service';
 @Component({
   selector: 'app-poll-card',
   standalone: true,
-  imports: [DatePipe, RouterLink, ButtonComponent],
+  imports: [DatePipe, ButtonComponent],
   templateUrl: './poll-card.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./poll-card.component.scss'],
 })
 export class PollCardComponent implements OnInit {
   @Input() poll!: Poll;
+  @Output() readonly pollDeleted = new EventEmitter<number>();
   status: string = '';
   statusClass: string = '';
   isDeleting = false;
@@ -29,14 +30,11 @@ export class PollCardComponent implements OnInit {
   }
 
   private calculateStatus() {
-    const now = new Date();
-    const startDate = new Date(this.poll.start_date);
-    const endDate = new Date(this.poll.end_date);
-
-    if (now < startDate) {
+    const status = getPollStatus(this.poll);
+    if (status === 'not-started') {
       this.status = 'Não iniciada';
       this.statusClass = 'not-started';
-    } else if (now >= startDate && now <= endDate) {
+    } else if (status === 'in-progress') {
       this.status = 'Em andamento';
       this.statusClass = 'in-progress';
     } else {
@@ -51,10 +49,9 @@ export class PollCardComponent implements OnInit {
       this.isDeleting = true;
       this.pollService.deletePoll(id).subscribe({
         next: () => {
-          window.location.reload();
+          this.pollDeleted.emit(id);
         },
-        error: (err) => {
-          console.error('Erro ao deletar enquete:', err);
+        error: () => {
           this.isDeleting = false;
         },
       });

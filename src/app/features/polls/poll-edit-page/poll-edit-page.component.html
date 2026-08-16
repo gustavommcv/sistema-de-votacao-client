@@ -1,50 +1,57 @@
 <div class="poll-edit">
   <h1 class="poll-edit__title">Editar Enquete</h1>
 
-  <div *ngIf="loading" class="poll-edit__loading">Carregando enquete...</div>
+  @if (loading) {
+    <div class="poll-edit__loading">Carregando enquete...</div>
+  }
 
-  <form
-    *ngIf="!loading"
-    [formGroup]="editForm"
-    (ngSubmit)="onSubmit()"
-    class="poll-edit__form"
-  >
-    <div class="poll-edit__form-group">
-      <label class="poll-edit__label">Título da Enquete</label>
-      <input type="text" formControlName="title" class="poll-edit__input" />
-
-      <div
-        *ngIf="editForm.get('title')?.invalid && editForm.get('title')?.touched"
-        class="poll-edit__error"
+  @if (!loading) {
+    <form
+      [formGroup]="editForm"
+      (ngSubmit)="onSubmit()"
+      class="poll-edit__form"
       >
-        <div *ngIf="editForm.get('title')?.errors?.['required']">
-          Título é obrigatório
-        </div>
-        <div *ngIf="editForm.get('title')?.errors?.['minlength']">
-          Mínimo 3 caracteres
-        </div>
+      <div class="poll-edit__form-group">
+        <label class="poll-edit__label">Título da Enquete</label>
+        <input type="text" formControlName="title" class="poll-edit__input" />
+        @if (editForm.get('title')?.invalid && editForm.get('title')?.touched) {
+          <div
+            class="poll-edit__error"
+            >
+            @if (editForm.get('title')?.errors?.['required']) {
+              <div>
+                Título é obrigatório
+              </div>
+            }
+            @if (editForm.get('title')?.errors?.['minlength']) {
+              <div>
+                Mínimo 3 caracteres
+              </div>
+            }
+          </div>
+        }
       </div>
-    </div>
-
-    <div *ngIf="error" class="poll-edit__error-message">
-      {{ error }}
-    </div>
-
-    <div class="poll-edit__actions">
-      <button
-        type="submit"
-        class="poll-edit__submit-btn"
-        [disabled]="editForm.invalid || saving"
-      >
-        {{ saving ? "Salvando..." : "Salvar" }}
-      </button>
-      <button
-        type="button"
-        class="poll-edit__cancel-btn"
-        (click)="router.navigate(['/polls', pollId])"
-      >
-        Cancelar
-      </button>
-    </div>
-  </form>
+      @if (error) {
+        <div class="poll-edit__error-message">
+          {{ error }}
+        </div>
+      }
+      <div class="poll-edit__actions">
+        <button
+          type="submit"
+          class="poll-edit__submit-btn"
+          [disabled]="editForm.invalid || saving"
+          >
+          {{ saving ? "Salvando..." : "Salvar" }}
+        </button>
+        <button
+          type="button"
+          class="poll-edit__cancel-btn"
+          (click)="router.navigate(['/polls', pollId])"
+          >
+          Cancelar
+        </button>
+      </div>
+    </form>
+  }
 </div>

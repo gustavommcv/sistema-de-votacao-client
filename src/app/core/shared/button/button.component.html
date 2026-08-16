@@ -3,11 +3,13 @@
     class="app-button app-button__link"
     [routerLink]="route()"
     [class.disabled]="disabled()"
+    [attr.aria-disabled]="disabled()"
+    (click)="preventDisabledLink($event)"
   >
     <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
   </a>
 } @else {
-  <button class="app-button" [disabled]="disabled()">
+  <button class="app-button" [disabled]="disabled()" [type]="type()">
     <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
   </button>
 }

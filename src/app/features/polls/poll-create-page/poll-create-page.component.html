@@ -5,7 +5,7 @@
     [formGroup]="pollForm"
     (ngSubmit)="onSubmit()"
     class="poll-create__form"
-  >
+    >
     <div class="poll-create__form-group">
       <label for="title" class="poll-create__label">Título da Enquete</label>
       <input
@@ -14,96 +14,102 @@
         formControlName="title"
         placeholder="Digite o título da enquete"
         class="poll-create__input"
-      />
-      <div
-        *ngIf="pollForm.get('title')?.invalid && pollForm.get('title')?.touched"
-        class="poll-create__error-message"
-      >
-        Título é obrigatório e deve ter pelo menos 5 caracteres
-      </div>
-    </div>
-
-    <div class="poll-create__date-row">
-      <div class="poll-create__form-group">
-        <label for="start_date" class="poll-create__label"
-          >Data de Início</label
-        >
-        <input
-          type="date"
-          id="start_date"
-          formControlName="start_date"
-          class="poll-create__input"
         />
-      </div>
-
-      <div class="poll-create__form-group">
-        <label for="end_date" class="poll-create__label">Data de Término</label>
-        <input
-          type="date"
-          id="end_date"
-          formControlName="end_date"
-          class="poll-create__input"
-        />
-      </div>
-    </div>
-
-    <div
-      *ngIf="
-        (dateError || pollForm.hasError('invalidDates')) &&
-        pollForm.get('start_date')?.touched &&
-        pollForm.get('end_date')?.touched
-      "
-      class="poll-create__error-message poll-create__error-message--date"
-    >
-      {{ dateError || "A data de término deve ser posterior à data de início" }}
-    </div>
-
-    <div class="poll-create__form-group">
-      <label class="poll-create__label">Opções de Resposta</label>
-      <div formArrayName="options" class="poll-create__options-list">
-        <div
-          *ngFor="let option of options.controls; let i = index"
-          [formGroupName]="i"
-          class="poll-create__option-item"
-        >
-          <input
-            type="text"
-            formControlName="text"
-            placeholder="Digite uma opção"
-            class="poll-create__input"
-          />
-          <button
-            type="button"
-            (click)="removeOption(i)"
-            class="poll-create__remove-btn"
-            [disabled]="options.length <= 3"
-          >
-            Remover
-          </button>
+        @if (pollForm.get('title')?.invalid && pollForm.get('title')?.touched) {
           <div
-            *ngIf="
-              options.at(i).get('text')?.invalid &&
-              options.at(i).get('text')?.touched
-            "
             class="poll-create__error-message"
-          >
-            Opção é obrigatória
+            >
+            Título é obrigatório e deve ter pelo menos 5 caracteres
           </div>
-        </div>
+        }
       </div>
-      <button type="button" (click)="addOption()" class="poll-create__add-btn">
-        Adicionar Opção
-      </button>
-    </div>
 
-    <div *ngIf="error" class="poll-create__form-error">
-      {{ error }}
-    </div>
+      <div class="poll-create__date-row">
+        <div class="poll-create__form-group">
+          <label for="start_date" class="poll-create__label"
+            >Data de Início</label
+            >
+            <input
+              type="date"
+              id="start_date"
+              formControlName="start_date"
+              class="poll-create__input"
+              />
+            </div>
 
-    <div class="poll-create__actions">
-      <app-button type="submit" [disabled]="pollForm.invalid || loading">
-        {{ loading ? "Criando..." : "Criar Enquete" }}
-      </app-button>
-    </div>
-  </form>
-</div>
+            <div class="poll-create__form-group">
+              <label for="end_date" class="poll-create__label">Data de Término</label>
+              <input
+                type="date"
+                id="end_date"
+                formControlName="end_date"
+                class="poll-create__input"
+                />
+              </div>
+            </div>
+
+            @if (
+              (dateError || pollForm.hasError('invalidDates')) &&
+              pollForm.get('start_date')?.touched &&
+              pollForm.get('end_date')?.touched
+              ) {
+              <div
+                class="poll-create__error-message poll-create__error-message--date"
+                >
+                {{ dateError || "A data de término deve ser posterior à data de início" }}
+              </div>
+            }
+
+            <div class="poll-create__form-group">
+              <label class="poll-create__label">Opções de Resposta</label>
+              <div formArrayName="options" class="poll-create__options-list">
+                @for (option of options.controls; track option; let i = $index) {
+                  <div
+                    [formGroupName]="i"
+                    class="poll-create__option-item"
+                    >
+                    <input
+                      type="text"
+                      formControlName="text"
+                      placeholder="Digite uma opção"
+                      class="poll-create__input"
+                      />
+                      <button
+                        type="button"
+                        (click)="removeOption(i)"
+                        class="poll-create__remove-btn"
+                        [disabled]="options.length <= 3"
+                        >
+                        Remover
+                      </button>
+                      @if (
+                        options.at(i).get('text')?.invalid &&
+                        options.at(i).get('text')?.touched
+                        ) {
+                        <div
+                          class="poll-create__error-message"
+                          >
+                          Opção é obrigatória
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+                <button type="button" (click)="addOption()" class="poll-create__add-btn">
+                  Adicionar Opção
+                </button>
+              </div>
+
+              @if (error) {
+                <div class="poll-create__form-error">
+                  {{ error }}
+                </div>
+              }
+
+              <div class="poll-create__actions">
+                <app-button type="submit" [disabled]="pollForm.invalid || loading">
+                  {{ loading ? "Criando..." : "Criar Enquete" }}
+                </app-button>
+              </div>
+            </form>
+          </div>

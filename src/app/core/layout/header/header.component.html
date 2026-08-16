@@ -14,6 +14,6 @@
   @if (authService.isAuthenticated$ | async) {
     <app-button (click)="logout()">Sair</app-button>
   } @else {
-    <app-button routerLink="/login">Entrar</app-button>
+    <app-button [isLink]="true" route="/login">Entrar</app-button>
   }
 </header>

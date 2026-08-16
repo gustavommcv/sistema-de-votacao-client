@@ -15,12 +15,13 @@
     >
   </div>
   <div class="poll-card__actions">
-    <app-button [routerLink]="['/polls', poll.id]" class="poll-card__action-btn"
+    <app-button [isLink]="true" [route]="['/polls', poll.id]" class="poll-card__action-btn"
       >Ver detalhes</app-button
     >
     @if (authService.getCurrentUser()?.id === poll.user_id) {
       <app-button
-        routerLink="/polls/{{ poll.id }}/edit"
+        [isLink]="true"
+        [route]="['/polls', poll.id, 'edit']"
         class="poll-card__action-btn poll-card__action-btn--edit"
       >
         Editar Título

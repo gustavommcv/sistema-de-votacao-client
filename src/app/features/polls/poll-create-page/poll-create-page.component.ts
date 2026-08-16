@@ -1,17 +1,28 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+import {
+  AbstractControl,
+  FormArray,
+  FormBuilder,
+  FormGroup,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ButtonComponent } from '../../../core/shared/button/button.component';
 import { PollService } from '../../../core/polls/poll.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { getApiErrorMessage } from '../../../core/http/api-error';
 
 @Component({
   selector: 'app-poll-create-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, ButtonComponent],
+  imports: [ReactiveFormsModule, FormsModule, ButtonComponent],
   templateUrl: './poll-create-page.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./poll-create-page.component.scss'],
 })
 export class PollCreatePageComponent {
@@ -36,17 +47,15 @@ export class PollCreatePageComponent {
           { validators: Validators.minLength(3) },
         ),
       },
-      { validator: this.dateValidator },
+      { validators: this.dateValidator },
     );
-
-    if (!this.authService.isLoggedIn()) {
-      this.router.navigate(['/login']);
-    }
   }
 
-  private dateValidator(group: FormGroup): { [key: string]: any } | null {
-    const startDate = group.get('start_date')?.value;
-    const endDate = group.get('end_date')?.value;
+  private readonly dateValidator: ValidatorFn = (
+    group: AbstractControl,
+  ): ValidationErrors | null => {
+    const startDate = group.get('start_date')?.value as string | undefined;
+    const endDate = group.get('end_date')?.value as string | undefined;
 
     if (!startDate || !endDate) {
       return null;
@@ -56,7 +65,7 @@ export class PollCreatePageComponent {
     const end = new Date(endDate);
 
     return start >= end ? { invalidDates: true } : null;
-  }
+  };
 
   createOption(): FormGroup {
     return this.fb.group({
@@ -121,16 +130,15 @@ export class PollCreatePageComponent {
           this.loading = false;
         }
       },
-      error: (err) => {
-        console.error('Erro ao criar enquete:', err);
-
-        if (err.status === 401) {
+      error: (requestError: unknown) => {
+        if (requestError instanceof HttpErrorResponse && requestError.status === 401) {
           this.error = 'Sua sessão expirou. Faça login novamente.';
-          this.authService.logout().subscribe(() => {
-            this.router.navigate(['/login']);
-          });
+          this.authService.checkAuth().subscribe(() => this.router.navigate(['/login']));
         } else {
-          this.error = 'Erro ao criar enquete. Tente novamente.';
+          this.error = getApiErrorMessage(
+            requestError,
+            'Erro ao criar enquete. Tente novamente.',
+          );
         }
 
         this.loading = false;

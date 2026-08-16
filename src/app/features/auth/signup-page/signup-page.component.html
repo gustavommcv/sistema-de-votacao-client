@@ -9,66 +9,86 @@
           [class.signup__input--invalid]="
             signupForm.get('email')?.invalid && signupForm.get('email')?.touched
           " />
-        <div *ngIf="
+          @if (
             signupForm.get('email')?.invalid && signupForm.get('email')?.touched
-          " class="signup__error-message">
-          <span *ngIf="signupForm.get('email')?.errors?.['required']">Email é obrigatório</span>
-          <span *ngIf="signupForm.get('email')?.errors?.['email']">Digite um email válido</span>
+            ) {
+            <div class="signup__error-message">
+              @if (signupForm.get('email')?.errors?.['required']) {
+                <span>Email é obrigatório</span>
+              }
+              @if (signupForm.get('email')?.errors?.['email']) {
+                <span>Digite um email válido</span>
+              }
+            </div>
+          }
         </div>
-      </div>
 
-      <div class="signup__form-group">
-        <label for="password" class="signup__label">Senha</label>
-        <input type="password" id="password" formControlName="password" placeholder="Digite sua senha"
+        <div class="signup__form-group">
+          <label for="password" class="signup__label">Senha</label>
+          <input type="password" id="password" formControlName="password" placeholder="Digite sua senha"
           class="signup__input" [class.signup__input--invalid]="
             signupForm.get('password')?.invalid &&
             signupForm.get('password')?.touched
           " />
-        <div *ngIf="
-            signupForm.get('password')?.invalid &&
-            signupForm.get('password')?.touched
-          " class="signup__error-message">
-          <span *ngIf="signupForm.get('password')?.errors?.['required']">Senha é obrigatória</span>
-          <span *ngIf="signupForm.get('password')?.errors?.['minlength']">
-            Senha deve ter no mínimo 3 caracteres
-          </span>
-          <span *ngIf="signupForm.get('password')?.errors?.['maxlength']">
-            Senha deve ter no máximo 100 caracteres
-          </span>
-        </div>
-      </div>
+            @if (
+              signupForm.get('password')?.invalid &&
+              signupForm.get('password')?.touched
+              ) {
+              <div class="signup__error-message">
+                @if (signupForm.get('password')?.errors?.['required']) {
+                  <span>Senha é obrigatória</span>
+                }
+                @if (signupForm.get('password')?.errors?.['minlength']) {
+                  <span>
+                    Senha deve ter no mínimo 8 caracteres
+                  </span>
+                }
+                @if (signupForm.get('password')?.errors?.['maxlength']) {
+                  <span>
+                    Senha deve ter no máximo 100 caracteres
+                  </span>
+                }
+              </div>
+            }
+          </div>
 
-      <div class="signup__form-group">
-        <label for="confirmPassword" class="signup__label">Confirmar Senha</label>
-        <input type="password" id="confirmPassword" formControlName="confirmPassword" placeholder="Confirme sua senha"
+          <div class="signup__form-group">
+            <label for="confirmPassword" class="signup__label">Confirmar Senha</label>
+            <input type="password" id="confirmPassword" formControlName="confirmPassword" placeholder="Confirme sua senha"
           class="signup__input" [class.signup__input--invalid]="
             signupForm.get('confirmPassword')?.invalid &&
             signupForm.get('confirmPassword')?.touched
           " />
-        <div *ngIf="
-            signupForm.get('confirmPassword')?.invalid &&
-            signupForm.get('confirmPassword')?.touched
-          " class="signup__error-message">
-          <span *ngIf="signupForm.get('confirmPassword')?.errors?.['required']">
-            Confirmação de senha é obrigatória
-          </span>
+              @if (
+                signupForm.get('confirmPassword')?.invalid &&
+                signupForm.get('confirmPassword')?.touched
+                ) {
+                <div class="signup__error-message">
+                  @if (signupForm.get('confirmPassword')?.errors?.['required']) {
+                    <span>
+                      Confirmação de senha é obrigatória
+                    </span>
+                  }
+                </div>
+              }
+            </div>
+
+            @if (error) {
+              <div class="signup__error">
+                {{ error }}
+              </div>
+            }
+
+            <div class="signup__actions">
+              <app-button type="submit" [disabled]="signupForm.invalid || loading" class="signup__button">
+                {{ loading ? "Cadastrando..." : "Cadastrar" }}
+              </app-button>
+            </div>
+          </form>
+
+          <div class="signup__footer">
+            Já tem uma conta?
+            <a routerLink="/login" class="signup__footer-link">Faça login</a>
+          </div>
         </div>
       </div>
-
-      <div *ngIf="error" class="signup__error">
-        {{ error }}
-      </div>
-
-      <div class="signup__actions">
-        <app-button type="submit" [disabled]="signupForm.invalid || loading" class="signup__button">
-          {{ loading ? "Cadastrando..." : "Cadastrar" }}
-        </app-button>
-      </div>
-    </form>
-
-    <div class="signup__footer">
-      Já tem uma conta?
-      <a routerLink="/login" class="signup__footer-link">Faça login</a>
-    </div>
-  </div>
-</div>

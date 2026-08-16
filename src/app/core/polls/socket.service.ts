@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { environment } from '../../../environments/environment';
+import type { VoteUpdatedEvent } from '../models/poll.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SocketService {
-  private socket: Socket;
+  private readonly socket: Socket;
 
   constructor() {
     this.socket = io(environment.socketUrl, {
@@ -15,25 +16,23 @@ export class SocketService {
     });
   }
 
-  onVoteUpdated(callback: (data: any) => void) {
+  onVoteUpdated(callback: (data: VoteUpdatedEvent) => void): void {
     this.socket.on('voteUpdated', callback);
   }
 
-  offVoteUpdated(callback: (data: any) => void) {
+  offVoteUpdated(callback: (data: VoteUpdatedEvent) => void): void {
     this.socket.off('voteUpdated', callback);
   }
 
-  joinPollRoom(pollId: number) {
+  joinPollRoom(pollId: number): void {
     this.socket.emit('joinPollRoom', pollId.toString());
   }
 
-  leavePollRoom(pollId: number) {
+  leavePollRoom(pollId: number): void {
     this.socket.emit('leavePollRoom', pollId.toString());
   }
 
-  disconnect() {
-    if (this.socket) {
-      this.socket.disconnect();
-    }
+  disconnect(): void {
+    this.socket.disconnect();
   }
 }
